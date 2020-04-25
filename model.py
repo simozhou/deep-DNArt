@@ -266,7 +266,7 @@ def plot_genomes(chromosomes, model, filename, height=256, width=256):
 
     images = generator.predict(chromosomes)
 
-    plt.figure(figsize=(12,10))
+    plt.figure(figsize=(12,8))
     for i in range(images.shape[0]):
         plt.subplot(4, 6, i+1)
         image = images[i, :, :, :]
