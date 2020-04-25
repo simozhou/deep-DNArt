@@ -177,8 +177,8 @@ class Artsy_DCGAN(object):
             noise = np.random.binomial(1, 0.05, size=[self.batch_size, 400])
             images_fake = self.generator.predict(noise)
             x = np.concatenate((images_train, images_fake))
-            y = np.ones([2*self.batch_size, 1])
-            y[self.batch_size:, :] = 0
+            y = np.ones([2*images_train.shape[0], 1])
+            y[images_train.shape[0]:, :] = 0
             # we train the discriminator first (teaching the police how to do its job)
             d_loss = self.discriminator.train_on_batch(x, y)
 
@@ -228,4 +228,5 @@ if __name__ == '__main__':
     artsy_dcgan.train(train_steps=2000, save_interval=50)
     timer.elapsed_time()
     artsy_dcgan.plot_images(fake=True)
+
     # artsy_dcgan.plot_images(fake=False, save2file=True)
