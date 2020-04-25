@@ -80,7 +80,7 @@ class DCGAN(object):
         dim = 64
         # In: ?
         # Out: dim x dim x depth
-        self.G.add(Dense(dim*dim*depth, input_dim=40000))
+        self.G.add(Dense(dim*dim*depth, input_dim=10000))
         self.G.add(BatchNormalization(momentum=0.9))
         self.G.add(Activation('relu'))
         self.G.add(Reshape((dim, dim, depth)))
@@ -103,7 +103,7 @@ class DCGAN(object):
         self.G.add(Activation('relu'))
 
         # Out: 256 x 256 x 3 RGB image [0.0,1.0] per pix
-        self.G.add(Conv2DTranspose(1, 5, padding='same'))
+        self.G.add(Conv2DTranspose(int(depth/8), 5, padding='same'))
         self.G.add(Activation('sigmoid'))
         self.G.summary()
         return self.G
@@ -169,12 +169,12 @@ class Artsy_DCGAN(object):
         noise_input = None
         if save_interval>0:
             # noise should have the same size of our data!
-            noise_input = np.random.binomial(1, 0.05, size=[16, 40000])
+            noise_input = np.random.binomial(1, 0.05, size=[16, 10000])
         # for each batch
         for images_batch in self.x_train:
             # this might need ad additional channel
             images_train = images_batch
-            noise = np.random.binomial(1, 0.05, size=[self.batch_size, 40000])
+            noise = np.random.binomial(1, 0.05, size=[self.batch_size, 10000])
             images_fake = self.generator.predict(noise)
             x = np.concatenate((images_train, images_fake))
             y = np.ones([2*self.batch_size, 1])
@@ -183,7 +183,7 @@ class Artsy_DCGAN(object):
             d_loss = self.discriminator.train_on_batch(x, y)
 
             y = np.ones([self.batch_size, 1])
-            noise = np.random.binomial(1, 0.05, size=[self.batch_size, 40000])
+            noise = np.random.binomial(1, 0.05, size=[self.batch_size, 10000])
             # then we let the police teach the generator how to create good images
             a_loss = self.adversarial.train_on_batch(noise, y)
             log_mesg = "%d: [D loss: %f, acc: %f]" % (i, d_loss[0], d_loss[1])
@@ -198,7 +198,7 @@ class Artsy_DCGAN(object):
         filename = 'artsy.png'
         if fake:
             if noise is None:
-                noise = np.random.binomial(1, 0.05, size=[samples, 40000])
+                noise = np.random.binomial(1, 0.05, size=[samples, 10000])
             else:
                 filename = "artsy_%d.png" % step
             images = self.generator.predict(noise)
