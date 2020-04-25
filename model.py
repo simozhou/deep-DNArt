@@ -145,19 +145,19 @@ class Artsy_DCGAN(object):
         self.batch_size = 64
         # DATA INPUT: we generate 256x256 images
         train_datagen = ImageDataGenerator(
-    	rescale=1/255,
-    	zoom_range=0.2,
-    	fill_mode='nearest'
+        rescale=1/255,
+        zoom_range=0.2,
+        fill_mode='nearest'
 		)
 
         train_generator = train_datagen.flow_from_directory(
-	    img_dir,
-	    classes=['landscape']
-	    target_size=(256, 256),
-	    batch_size=self.batch_size,
-	    class_mode=None,
-	    color_mode="rgb"
-		)
+        img_dir,
+        classes=['landscape']
+        target_size=(256, 256),
+        batch_size=self.batch_size,
+        class_mode=None,
+        color_mode="rgb"
+        )
 
         self.x_train = train_generator
         # self.x_train = self.x_train.reshape(-1, self.img_rows,\
@@ -171,11 +171,11 @@ class Artsy_DCGAN(object):
     def train(self, train_steps=2000, save_interval=0):
         noise_input = None
         if save_interval>0:
-        	# noise should have the same size of our data!
+            # noise should have the same size of our data!
             noise_input = np.random.binomial(1, 0.05, size=[16, 40000])
         # for each batch
         for images_batch in self.x_train:
-        	# this might need ad additional channel
+            # this might need ad additional channel
             images_train = images_batch
             noise = np.random.binomial(1, 0.05, size=[self.batch_size, 40000])
             images_fake = self.generator.predict(noise)
