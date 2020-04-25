@@ -174,7 +174,7 @@ class Artsy_DCGAN(object):
         for (i, images_batch) in enumerate(self.x_train):
             # this might need ad additional channel
             images_train = images_batch
-            noise = np.random.binomial(1, 0.05, size=[self.batch_size, 400])
+            noise = np.random.binomial(1, 0.05, size=[images_train.shape[0], 400])
             images_fake = self.generator.predict(noise)
             x = np.concatenate((images_train, images_fake))
             y = np.ones([2*images_train.shape[0], 1])
