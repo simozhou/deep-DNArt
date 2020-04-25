@@ -1,6 +1,8 @@
 import numpy as np
 import time
 import tensorflow as tf
+import subprocess
+import glob
 
 from keras.models import Sequential, load_model
 from keras.layers import Dense, Activation, Flatten, Reshape
@@ -221,11 +223,39 @@ class Artsy_DCGAN(object):
         else:
             plt.show()
 
+def extract_chromosome_information(path):
+    """Extract the chromosome information from a id_XXXXXXXXX.simple_format.zip folder:
+    1. The chromosome files are extracted from the zip folder. (Chromosomes X and Y are disregarded)
+    2. The input information for the network is extracted for each chromosome and appended to the networkinput file: 
+    for groups of 25 subsequent SNP positions in a range of 10,000 SNPs in total (outputting 400 values per chromosome), 
+    it is determined if one or more SNPs are heterozygous (output a line with 1) 
+    or if all 25 SNP positions are homozygous (output a line with 0).
+    3. The extracted files are deleted again. 
+    4. The networkinput file is opened as a numpy array and restructured in 22 rows of 400 binary values.
+
+    input:
+    path : the path to the folder in which the id_XXXXXXXXX.simple_format.zip file can be found, e.g. 'id_XXXXXXXXX'
+
+    output:
+    chromosomes : a numpy array of shape (22, 400), one row per chromosome containing the 400 extracted heterozygosity values
+    """
+    # Generate the networkinput file if it's not created yet
+    if len(glob.glob("%s/*networkinput.txt" % path)) == 0:
+        print('Extracting chromosomes from folder: ', path)
+        subprocess.call("""find %s -name "*.simple_format.zip" | while read filename; do unzip -o -d "`dirname "$filename"`" "$filename" "*chr[0-9]*" ; done; """ % path, shell=True)
+        subprocess.call("""find %s -type f -name "*_chr*.simple_format.txt" | sort -V | while read chr_filename; do head -n 40000 $chr_filename  | awk ' {s += (substr($4,1,1) != substr($4,2,2))} NR>=10000 && NR<20000 && NR%%25==0 {print s!=0;s=0}' >> "${chr_filename%%_chr*.*.*}_networkinput.txt" ; done;"""% path, shell=True)
+        subprocess.call("""rm %s/*.simple_format.txt"""% path, shell=True)
+
+    input_filename = glob.glob("%s/*_networkinput.txt" % path)[0]
+    chromosomes = np.genfromtxt(input_filename)
+    chromosomes = np.reshape(chromosomes, (22, 400), order='C')
+    return chromosomes
+            
 def plot_genomes(chromosomes, model, filename, height=256, width=256):
     """
     Helper function transforming the set of chromosomes into a modular karyospectrum
     
-    chromosomes : numpy array [23, 400]
+    chromosomes : numpy array [22, 400]
     model : path to file of the saved keras model
     filename : str name of the output image
     height : int 
@@ -258,3 +288,9 @@ if __name__ == '__main__':
     artsy_dcgan.plot_images(fake=True)
 
     # artsy_dcgan.plot_images(fake=False, save2file=True)
+
+    # To loop over all folders with genome information and plot their content with our trained model:
+#     foldernames = glob.glob("../data/id_*")
+#     for folder in foldernames:
+#         chromosomes = extract_chromosome_information(folder)
+          #plot_genomes(chromosomes, ....)
