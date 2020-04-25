@@ -2,7 +2,7 @@ import numpy as np
 import time
 import tensorflow as tf
 
-from keras.models import Sequential
+from keras.models import Sequential, load_model
 from keras.layers import Dense, Activation, Flatten, Reshape
 from keras.layers import Conv2D, Conv2DTranspose, UpSampling2D
 from keras.layers import LeakyReLU, Dropout
@@ -74,7 +74,7 @@ class DCGAN(object):
         if self.G:
             return self.G
         self.G = Sequential()
-        dropout = 0.4
+        dropout = 0.3
         # TODO len(vector of SNPs)
         depth = 24
         dim = 64
@@ -113,7 +113,7 @@ class DCGAN(object):
         if self.DM:
             return self.DM
         # optimizable parameters (learning rate and decay)
-        optimizer = RMSprop(lr=0.0002, decay=6e-8)
+        optimizer = RMSprop(lr=0.0004, decay=6e-8)
         self.DM = Sequential()
         self.DM.add(self.discriminator())
         self.DM.compile(loss='binary_crossentropy', optimizer=optimizer,\
@@ -124,7 +124,7 @@ class DCGAN(object):
         if self.AM:
             return self.AM
         # optimizable parameters (learning rate and decay)
-        optimizer = RMSprop(lr=0.0002, decay=3e-8)
+        optimizer = RMSprop(lr=0.0004, decay=3e-8)
         self.AM = Sequential()
         self.AM.add(self.generator())
         self.AM.add(self.discriminator())
@@ -142,8 +142,6 @@ class Artsy_DCGAN(object):
         self.batch_size = 64
         # DATA INPUT: we generate 256x256 images
         train_datagen = ImageDataGenerator(
-        rescale=1/255,
-        zoom_range=0.2,
         fill_mode='nearest'
         )
 
@@ -169,12 +167,12 @@ class Artsy_DCGAN(object):
         noise_input = None
         if save_interval>0:
             # noise should have the same size of our data!
-            noise_input = np.random.binomial(1, 0.05, size=[16, 400])
+            noise_input = np.random.binomial(1, 0.5, size=[16, 400])
         # for each batch
         for (i, images_batch) in enumerate(self.x_train):
             # this might need ad additional channel
             images_train = images_batch
-            noise = np.random.binomial(1, 0.05, size=[images_train.shape[0], 400])
+            noise = np.random.binomial(1, 0.5, size=[images_train.shape[0], 400])
             images_fake = self.generator.predict(noise)
             x = np.concatenate((images_train, images_fake))
             y = np.ones([2*images_train.shape[0], 1])
@@ -183,7 +181,7 @@ class Artsy_DCGAN(object):
             d_loss = self.discriminator.train_on_batch(x, y)
 
             y = np.ones([self.batch_size, 1])
-            noise = np.random.binomial(1, 0.05, size=[self.batch_size, 400])
+            noise = np.random.binomial(1, 0.4, size=[self.batch_size, 400])
             # then we let the police teach the generator how to create good images
             a_loss = self.adversarial.train_on_batch(noise, y)
             log_mesg = "%d: [D loss: %f, acc: %f]" % (i, d_loss[0], d_loss[1])
@@ -198,7 +196,7 @@ class Artsy_DCGAN(object):
         filename = 'artsy.png'
         if fake:
             if noise is None:
-                noise = np.random.binomial(1, 0.05, size=[samples, 400])
+                noise = np.random.binomial(1, 0.5, size=[samples, 400])
             else:
                 filename = "artsy_%d.png" % step
             images = self.generator.predict(noise)
@@ -221,11 +219,39 @@ class Artsy_DCGAN(object):
         else:
             plt.show()
 
+def plot_genomes(chromosomes, model, filename, height=256, width=256):
+    """
+    Helper function transforming the set of chromosomes into a modular karyospectrum
+    
+    chromosomes : numpy array [23, 400]
+    model : path to file of the saved keras model
+    filename : str name of the output image
+    height : int 
+    width : int
+
+    """
+    generator = load_model(model)
+
+    images = generator.predict(chromosomes)
+
+    plt.figure(figsize=(12,12))
+    for i in range(images.shape[0]):
+        plt.subplot(5, 5, i+1)
+        image = images[i, :, :, :]
+        image = np.reshape(image, [height, width, 3])
+        plt.imshow(image)
+        plt.axis('off')
+    plt.tight_layout()
+    plt.savefig(filename)
+    plt.close('all')
+    
+
+
 if __name__ == '__main__':
     # test run
-    artsy_dcgan = Artsy_DCGAN(img_dir="/home/ubuntu/art/wikiart")
+    artsy_dcgan = Artsy_DCGAN(img_dir=".")
     timer = ElapsedTimer()
-    artsy_dcgan.train(train_steps=2000, save_interval=50)
+    artsy_dcgan.train(train_steps=2000, save_interval=10)
     timer.elapsed_time()
     artsy_dcgan.plot_images(fake=True)
 
