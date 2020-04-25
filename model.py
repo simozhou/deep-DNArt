@@ -74,7 +74,7 @@ class DCGAN(object):
         if self.G:
             return self.G
         self.G = Sequential()
-        dropout = 0.3
+        dropout = 0.5
         # TODO len(vector of SNPs)
         depth = 24
         dim = 64
@@ -113,7 +113,7 @@ class DCGAN(object):
         if self.DM:
             return self.DM
         # optimizable parameters (learning rate and decay)
-        optimizer = RMSprop(lr=0.0004, decay=6e-8)
+        optimizer = RMSprop(lr=0.0008, decay=6e-8)
         self.DM = Sequential()
         self.DM.add(self.discriminator())
         self.DM.compile(loss='binary_crossentropy', optimizer=optimizer,\
@@ -124,7 +124,7 @@ class DCGAN(object):
         if self.AM:
             return self.AM
         # optimizable parameters (learning rate and decay)
-        optimizer = RMSprop(lr=0.0004, decay=3e-8)
+        optimizer = RMSprop(lr=0.0002, decay=3e-8)
         self.AM = Sequential()
         self.AM.add(self.generator())
         self.AM.add(self.discriminator())
