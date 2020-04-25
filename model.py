@@ -155,7 +155,8 @@ class Artsy_DCGAN(object):
 	    classes=['landscape']
 	    target_size=(256, 256),
 	    batch_size=self.batch_size,
-	    class_mode='categorical'
+	    class_mode=None,
+	    color_mode="rgb"
 		)
 
         self.x_train = train_generator
@@ -224,7 +225,8 @@ class Artsy_DCGAN(object):
             plt.show()
 
 if __name__ == '__main__':
-    artsy_dcgan = Artsy_DCGAN(img_dir="/home/ubuntu/wikiart")
+	# test run
+    artsy_dcgan = Artsy_DCGAN(img_dir="/home/ubuntu/simone/test/")
     timer = ElapsedTimer()
     artsy_dcgan.train(train_steps=10000, save_interval=500)
     timer.elapsed_time()
