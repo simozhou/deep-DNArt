@@ -1,7 +1,6 @@
 import numpy as np
 import time
 import tensorflow as tf
-from tf.Data import Dataset, Iterator
 
 from keras.models import Sequential
 from keras.layers import Dense, Activation, Flatten, Reshape
