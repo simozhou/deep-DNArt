@@ -1,6 +1,7 @@
 import numpy as np
 import time
-from tensorflow.examples.tutorials.mnist import input_data
+import tensorflow as tf
+from tf.Data import Dataset, Iterator
 
 from keras.models import Sequential
 from keras.layers import Dense, Activation, Flatten, Reshape
@@ -139,10 +140,22 @@ class Artsy_DCGAN(object):
         self.img_cols = 256
         self.channel = 3
 
-        # self.x_train = input_data.read_data_sets("mnist",\
-        # 	one_hot=True).train.images
-        # self.x_train = self.x_train.reshape(-1, self.img_rows,\
-        # 	self.img_cols, 1).astype(np.float32)
+        train_datagen = ImageDataGenerator(
+    	rescale=1/255,
+    	zoom_range=0.2,
+    	fill_mode='nearest'
+		)
+
+        train_generator = train_datagen.flow_from_directory(
+	    img_dir,
+	    target_size=(256, 256),
+	    batch_size=batch_size,
+	    class_mode='categorical',
+		)
+
+        self.x_train = tf.data.Dataset.from_generator(train_generator, tf.int64)
+        self.x_train = self.x_train.reshape(-1, self.img_rows,\
+         	self.img_cols, 1).astype(np.float32)
 
         self.DCGAN = DCGAN()
         self.discriminator =  self.DCGAN.discriminator_model()
