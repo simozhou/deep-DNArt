@@ -147,7 +147,7 @@ class Artsy_DCGAN(object):
 
         train_generator = train_datagen.flow_from_directory(
         img_dir,
-        classes=['landscape'],
+        classes=['marina'],
         target_size=(256, 256),
         batch_size=self.batch_size,
         class_mode=None,
@@ -249,7 +249,7 @@ def plot_genomes(chromosomes, model, filename, height=256, width=256):
 
 if __name__ == '__main__':
     # test run
-    artsy_dcgan = Artsy_DCGAN(img_dir=".")
+    artsy_dcgan = Artsy_DCGAN(img_dir="/home/ubuntu/art/wikiart")
     timer = ElapsedTimer()
     artsy_dcgan.train(train_steps=2000, save_interval=10)
     timer.elapsed_time()
