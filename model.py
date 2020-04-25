@@ -9,6 +9,7 @@ from keras.layers import Conv2D, Conv2DTranspose, UpSampling2D
 from keras.layers import LeakyReLU, Dropout
 from keras.layers import BatchNormalization
 from keras.optimizers import Adam, RMSprop
+from keras.preprocessing.image import ImageDataGenerator
 
 import matplotlib.pyplot as plt
 
@@ -139,7 +140,10 @@ class Artsy_DCGAN(object):
         self.img_rows = 256
         self.img_cols = 256
         self.channel = 3
-
+        # we set the batch size to half of the actual one,
+        # so that the final batch (real images + noise generated becomes 128)
+        self.batch_size = 64
+        # DATA INPUT: we generate 256x256 images
         train_datagen = ImageDataGenerator(
     	rescale=1/255,
     	zoom_range=0.2,
@@ -148,38 +152,40 @@ class Artsy_DCGAN(object):
 
         train_generator = train_datagen.flow_from_directory(
 	    img_dir,
+	    classes=['landscape']
 	    target_size=(256, 256),
-	    batch_size=batch_size,
-	    class_mode='categorical',
+	    batch_size=self.batch_size,
+	    class_mode='categorical'
 		)
 
-        self.x_train = tf.data.Dataset.from_generator(train_generator, tf.int64)
-        self.x_train = self.x_train.reshape(-1, self.img_rows,\
-         	self.img_cols, 1).astype(np.float32)
+        self.x_train = train_generator
+        # self.x_train = self.x_train.reshape(-1, self.img_rows,\
+        #  	self.img_cols, 1).astype(np.float32)
 
         self.DCGAN = DCGAN()
         self.discriminator =  self.DCGAN.discriminator_model()
         self.adversarial = self.DCGAN.adversarial_model()
         self.generator = self.DCGAN.generator()
 
-    def train(self, train_steps=2000, batch_size=256, save_interval=0):
+    def train(self, train_steps=2000, save_interval=0):
         noise_input = None
         if save_interval>0:
         	# noise should have the same size of our data!
-            noise_input = np.random.randint(0, 1, size=[16, 100])
-        for i in range(train_steps):
-            images_train = self.x_train[np.random.randint(0,
-                self.x_train.shape[0], size=batch_size), :, :, :]
-            noise = np.random.randint(0, 1, size=[batch_size, 40000])
+            noise_input = np.random.binomial(1, 0.05, size=[16, 40000])
+        # for each batch
+        for images_batch in self.x_train:
+        	# this might need ad additional channel
+            images_train = images_batch
+            noise = np.random.binomial(1, 0.05, size=[self.batch_size, 40000])
             images_fake = self.generator.predict(noise)
             x = np.concatenate((images_train, images_fake))
-            y = np.ones([2*batch_size, 1])
-            y[batch_size:, :] = 0
+            y = np.ones([2*self.batch_size, 1])
+            y[self.batch_size:, :] = 0
             # we train the discriminator first (teaching the police how to do its job)
             d_loss = self.discriminator.train_on_batch(x, y)
 
-            y = np.ones([batch_size, 1])
-            noise = np.random.uniform(0, 1, size=[batch_size, ?])
+            y = np.ones([self.batch_size, 1])
+            noise = np.random.binomial(1, 0.05, size=[self.batch_size, 40000])
             # then we let the police teach the generator how to create good images
             a_loss = self.adversarial.train_on_batch(noise, y)
             log_mesg = "%d: [D loss: %f, acc: %f]" % (i, d_loss[0], d_loss[1])
@@ -194,11 +200,12 @@ class Artsy_DCGAN(object):
         filename = 'artsy.png'
         if fake:
             if noise is None:
-                noise = np.random.uniform(-1.0, 1.0, size=[samples, 100])
+                noise = np.random.binomial(1, 0.05, size=[samples, 40000])
             else:
                 filename = "artsy_%d.png" % step
             images = self.generator.predict(noise)
         else:
+        	# TODO fix this, train_generator has no shape attribute
             i = np.random.randint(0, self.x_train.shape[0], samples)
             images = self.x_train[i, :, :, :]
 
@@ -217,9 +224,9 @@ class Artsy_DCGAN(object):
             plt.show()
 
 if __name__ == '__main__':
-    artsy_dcgan = Artsy_DCGAN()
+    artsy_dcgan = Artsy_DCGAN(img_dir="/home/ubuntu/wikiart")
     timer = ElapsedTimer()
-    artsy_dcgan.train(train_steps=10000, batch_size=256, save_interval=500)
+    artsy_dcgan.train(train_steps=10000, save_interval=500)
     timer.elapsed_time()
     artsy_dcgan.plot_images(fake=True)
-    artsy_dcgan.plot_images(fake=False, save2file=True)
+    # artsy_dcgan.plot_images(fake=False, save2file=True)
