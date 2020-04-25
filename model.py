@@ -124,7 +124,7 @@ class DCGAN(object):
         if self.AM:
             return self.AM
         # optimizable parameters (learning rate and decay)
-        optimizer = RMSprop(lr=0.0001, decay=3e-8)
+        optimizer = RMSprop(lr=0.0002, decay=3e-8)
         self.AM = Sequential()
         self.AM.add(self.generator())
         self.AM.add(self.discriminator())
