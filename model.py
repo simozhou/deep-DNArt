@@ -268,7 +268,7 @@ def plot_genomes(chromosomes, model, filename, height=256, width=256):
 
     plt.figure(figsize=(12,10))
     for i in range(images.shape[0]):
-        plt.subplot(6, 4, i+1)
+        plt.subplot(4, 6, i+1)
         image = images[i, :, :, :]
         image = np.reshape(image, [height, width, 3])
         plt.imshow(image)
