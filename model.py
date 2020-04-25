@@ -225,7 +225,7 @@ if __name__ == '__main__':
     # test run
     artsy_dcgan = Artsy_DCGAN(img_dir="/home/ubuntu/art/wikiart")
     timer = ElapsedTimer()
-    artsy_dcgan.train(train_steps=10000, save_interval=500)
+    artsy_dcgan.train(train_steps=2000, save_interval=50)
     timer.elapsed_time()
     artsy_dcgan.plot_images(fake=True)
     # artsy_dcgan.plot_images(fake=False, save2file=True)
