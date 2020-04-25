@@ -77,7 +77,7 @@ class DCGAN(object):
         self.G = Sequential()
         dropout = 0.4
         # TODO len(vector of SNPs)
-        depth = 256
+        depth = 64
         dim = 32
         # In: ?
         # Out: dim x dim x depth
@@ -150,7 +150,7 @@ class Artsy_DCGAN(object):
 
         train_generator = train_datagen.flow_from_directory(
         img_dir,
-        classes=['landscape']
+        classes=['landscape'],
         target_size=(256, 256),
         batch_size=self.batch_size,
         class_mode=None,
