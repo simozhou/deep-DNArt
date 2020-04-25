@@ -171,7 +171,7 @@ class Artsy_DCGAN(object):
             # noise should have the same size of our data!
             noise_input = np.random.binomial(1, 0.05, size=[16, 4000])
         # for each batch
-        for images_batch in self.x_train:
+        for (i, images_batch) in enumerate(self.x_train):
             # this might need ad additional channel
             images_train = images_batch
             noise = np.random.binomial(1, 0.05, size=[self.batch_size, 4000])
