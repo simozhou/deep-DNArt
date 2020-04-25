@@ -104,7 +104,7 @@ class DCGAN(object):
 
         # Out: 256 x 256 x 3 RGB image [0.0,1.0] per pix
         self.G.add(Conv2DTranspose(int(depth/8), 5, padding='same'))
-        #self.G.add(Activation('sigmoid'))
+        self.G.add(Activation('sigmoid'))
         self.G.summary()
         return self.G
 
