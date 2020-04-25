@@ -7,10 +7,10 @@ Both art and DNA constist of a dual essence: if on one side they are unique, per
 And as unique-serial prints as we are, who is the artist that best could tell us apart? Art and DNA come together to test the ability of machines to descern uniqueness and essence of human being. 
 
 ### Karyospectrum: vintage biology is the new black
-Albeit being a strongly dynamic process, the creation of these art pieces was driven by one main focus: embed idiosyncracy on picture. So we decided to put up a machine GAN who would learn how to draw beautiful paintings from noise, and then feed to the *generator* SNPs data so to see the art that would be created from them. During the whole process we were seeing the outputted pictures as blocks of ~16-20 squares, all ordered. This "piling" of pictures reminded us of the karyotype, the process by which photographs of chromosomes are taken in order to determine the chromosome complement of an individual, including the number of chromosomes and any abnormalities [1]. This idea of "sorting chromosomes" inspired us to *update* karyotyping with 22 (+ the sex chromosome which we excluded for ease of simplicity) machine generated pictures from the chromosomes SNPs. These pictures are wildly abstract, similar to a collaboration between Pollock and Warhol (or just slightly messy if we're being honest)!! In their uniqueness, they entail common textures and colors. Here we've found back the aims that we set at the beginning of the journey, and thus decided the the art piece was complete.
+Albeit a strongly dynamic process, the creation of these art pieces was driven by one main focus: embed idiosyncracy on picture. So we decided to put up a machine GAN who would learn how to draw beautiful paintings from noise, and then feed to the *generator* SNPs data so to see the art that would be created from them. During the whole process we were seeing the outputted pictures as blocks of ~16-20 squares, all ordered. This "piling" of pictures reminded us of the karyotype, the process by which photographs of chromosomes are taken in order to determine the chromosome complement of an individual, including the number of chromosomes and any abnormalities [1]. This idea of "sorting chromosomes" inspired us to *update* karyotyping with 22 (+ the sex chromosome which we excluded for ease of simplicity) machine generated pictures from the chromosomes SNPs. These pictures are wildly abstract, similar to a collaboration between Pollock and Warhol (or just slightly messy if we're being honest)!! In their uniqueness, they entail common textures and colors. Here we've found back the aims that we set at the beginning of the journey, and thus decided the the art piece was complete.
 
-### Techinques and structure
-A Deep Convolutional Adversarial Network was built loosely based on the code of [2], which gave us incredible insights on how to structure the network and on hyperparameter tweaking. Here reported the structure of the two networks:
+### Method: the neurons generating your artpiece
+A Deep Convolutional Generative Adversarial Network (DCGAN) was built loosely based on the code of [2], which gave us incredible insights on how to structure the network and on hyperparameter tweaking. Here reported the structure of the two networks:
 
 ```
 DISCRIMINATOR
@@ -91,15 +91,24 @@ conv2d_transpose_8 (Conv2DTr (None, 256, 256, 3)       228
 ```
 
 Keras [3] on Tensorflow GPU was the library of choice.
-The network was trained on various subsets of data, but the one who shown best results was the `landscape` dataset, consisting of 3608 images of natural and urban landascapes.
+The network was trained on various subsets of data, but the one that showed best results was a dataset consisting of 3608 images of natural and urban landscapes taking from WikiArt, labeled with the genre `landscape` [4].
 
-The final model was trained for a total of 1100 epochs, and the objective for stopping training was mostly based on Discriminator loss and accuracy measures and *prettyness* of the pictures produced.
+The final model was trained for a total of 1100 epochs, and the objective for stopping training was mostly based on Discriminator loss, accuracy measures and *prettyness* of the pictures produced.
+
+### Data: what is this based on?
+The unique art pieces that this network generates are based on your SNPs - Single Nucleotide Polymorphisms. These are single-letter changes in your DNA that make you an outstanding individual, different from anyone else. For each chromosome pair, 10,000 SNP positions on which frequent changes are reported are used as the input for your art piece. You have 22 regular chromosome pairs (and 2 sex chromosomes), so that is 22 x 2 x 10,000 = 44,000 highly variable letters of your DNA that are represented in your art work! 
+
+For every SNP position your genome sequence contains two results, one on each chromosome of the chromosome pair, and these can either be the same (e.g. A and A), which is called homozygous, or they can be different (e.g. T and A), referred to as heterozygous. This information on the differences between your chromosomes is consolidated in groups of 25 SNPs positions. If one or more of these positions are heterozygous, the group gets marked positive - becoming a 1 in the input of the network. If all pairs contain the same letter, the group gets marked as negative - or 0. This sequence of 400 1s and 0s per chromosome is then used as input for the network to decide on your ultimate personal piece of art.
 
 ### Future perspectives
-Of course this is just the beginning of what might be a beautiful art form! WWith larger datasets and a little more time & patience in fine-tuning the parameters we're sure we could make something even prettier than this!
+Of course this is just the beginning of what might be a beautiful art form! With larger datasets and a little more time & patience in fine-tuning the parameters, we're sure your DNA sequences could result in something even prettier than this!
 
 
 
 [1] https://en.wikipedia.org/wiki/Karyotype
+
 [2] https://towardsdatascience.com/gan-by-example-using-keras-on-tensorflow-backend-1a6d515a60d0
+
 [3] https://keras.io/
+
+[4] https://www.wikiart.org/en/paintings-by-genre/landscape
