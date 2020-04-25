@@ -1,5 +1,6 @@
 import numpy as np
 import time
+from __future__ import *
 import tensorflow as tf
 
 from keras.models import Sequential
