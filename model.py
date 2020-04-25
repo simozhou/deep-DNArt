@@ -147,7 +147,7 @@ class Artsy_DCGAN(object):
 
         train_generator = train_datagen.flow_from_directory(
         img_dir,
-        classes=['mythological-painting'],
+        classes=['wildlife-painting'],
         target_size=(256, 256),
         batch_size=self.batch_size,
         class_mode=None,
