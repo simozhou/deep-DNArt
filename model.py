@@ -74,7 +74,7 @@ class DCGAN(object):
         if self.G:
             return self.G
         self.G = Sequential()
-        dropout = 0.5
+        dropout = 0.4
         # TODO len(vector of SNPs)
         depth = 24
         dim = 64
@@ -113,7 +113,7 @@ class DCGAN(object):
         if self.DM:
             return self.DM
         # optimizable parameters (learning rate and decay)
-        optimizer = RMSprop(lr=0.0008, decay=6e-8)
+        optimizer = RMSprop(lr=0.0004, decay=6e-8)
         self.DM = Sequential()
         self.DM.add(self.discriminator())
         self.DM.compile(loss='binary_crossentropy', optimizer=optimizer,\
@@ -142,12 +142,14 @@ class Artsy_DCGAN(object):
         self.batch_size = 64
         # DATA INPUT: we generate 256x256 images
         train_datagen = ImageDataGenerator(
+        rescale=1/255,
+        zoom_range=0.2,
         fill_mode='nearest'
         )
 
         train_generator = train_datagen.flow_from_directory(
         img_dir,
-        classes=['wildlife-painting'],
+        classes=['landscape'],
         target_size=(256, 256),
         batch_size=self.batch_size,
         class_mode=None,
