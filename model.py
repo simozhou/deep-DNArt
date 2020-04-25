@@ -76,8 +76,8 @@ class DCGAN(object):
         self.G = Sequential()
         dropout = 0.4
         # TODO len(vector of SNPs)
-        depth = 32
-        dim = 32
+        depth = 24
+        dim = 64
         # In: ?
         # Out: dim x dim x depth
         self.G.add(Dense(dim*dim*depth, input_dim=40000))
