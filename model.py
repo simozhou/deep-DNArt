@@ -139,7 +139,7 @@ class Artsy_DCGAN(object):
         self.channel = 3
         # we set the batch size to half of the actual one,
         # so that the final batch (real images + noise generated becomes 128)
-        self.batch_size = 64
+        self.batch_size = 32
         # DATA INPUT: we generate 256x256 images
         train_datagen = ImageDataGenerator(
         rescale=1/255,
