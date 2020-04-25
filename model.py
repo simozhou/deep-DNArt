@@ -14,7 +14,7 @@ from keras.preprocessing.image import ImageDataGenerator
 import matplotlib.pyplot as plt
 
 class ElapsedTimer(object):
-	"""Displays state of execution on the CLI"""
+    """Displays state of execution on the CLI"""
     def __init__(self):
         self.start_time = time.time()
     def elapsed(self,sec):
@@ -28,9 +28,8 @@ class ElapsedTimer(object):
         print("Elapsed: %s " % self.elapsed(time.time() - self.start_time) )
 
 class DCGAN(object):
-	"""Class object for the GAN network"""
+    """Class object for the GAN network"""
     def __init__(self, img_rows=256, img_cols=256, channel=3):
-
         self.img_rows = img_rows
         self.img_cols = img_cols
         self.channel = channel
@@ -65,7 +64,6 @@ class DCGAN(object):
         self.D.add(Conv2D(depth*8, 5, strides=1, padding='same'))
         self.D.add(LeakyReLU(alpha=0.2))
         self.D.add(Dropout(dropout))
-
         # Out: 1-dim probability
         self.D.add(Flatten())
         self.D.add(Dense(1))
@@ -112,7 +110,7 @@ class DCGAN(object):
         return self.G
 
     def discriminator_model(self):
-    	"""builds the discriminator model with dedicated optmizer and loss function"""
+        """builds the discriminator model with dedicated optmizer and loss function"""
         if self.DM:
             return self.DM
         # optimizable parameters (learning rate and decay)
@@ -225,7 +223,7 @@ class Artsy_DCGAN(object):
             plt.show()
 
 if __name__ == '__main__':
-	# test run
+    # test run
     artsy_dcgan = Artsy_DCGAN(img_dir="/home/ubuntu/simone/test/")
     timer = ElapsedTimer()
     artsy_dcgan.train(train_steps=10000, save_interval=500)
